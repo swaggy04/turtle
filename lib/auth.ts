@@ -11,21 +11,62 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+
     sendResetPassword: async ({ user, url }) => {
-      await resend.emails.send({
-        from: "Turtle <onboarding@resend.dev>",
-        to: user.email,
-        subject: "Reset your Turtle password",
-        html: `
-    <h2>Reset your password</h2>
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Reset your Turtle password</h2>
 
-    <p>Click the link below to reset your password.</p>
+          <p>Hello ${user.name ?? "there"},</p>
 
-    <a href="${url}">
-      Reset Password
-    </a>
-  `,
-      });
+          <p>
+            We received a request to reset your password.
+            Click the button below to choose a new password.
+          </p>
+
+          <p style="margin: 32px 0;">
+            <a
+              href="${url}"
+              style="
+                background:#111827;
+                color:white;
+                padding:12px 20px;
+                border-radius:8px;
+                text-decoration:none;
+                display:inline-block;
+              "
+            >
+              Reset Password
+            </a>
+          </p>
+
+          <p>
+            If you didn't request this password reset, you can safely ignore this email.
+          </p>
+
+          <p>
+            This link will expire automatically for your security.
+          </p>
+
+          <hr />
+
+          <p style="font-size:12px;color:#6b7280;">
+            Turtle AI App Builder
+          </p>
+        </div>
+      `;
+
+      try {
+        await resend.emails.send({
+          from: "Turtle <onboarding@resend.dev>",
+          to: user.email,
+          subject: "Reset your Turtle password",
+          html,
+        });
+      } catch (error) {
+        console.error("Failed to send password reset email:", error);
+        throw error;
+      }
     },
   },
 
