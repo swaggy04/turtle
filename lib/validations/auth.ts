@@ -29,3 +29,17 @@ export const signUpSchema = z
   });
 
 export type SignUpSchema = z.infer<typeof signUpSchema>;
+
+
+export const signInSchema = z.object({
+  email: z
+    .email("Please enter a valid email")
+    .trim()
+    .toLowerCase(),
+
+  password: z
+    .string()
+    .min(1, "Password is required"),
+});
+
+export type SignInSchema = z.infer<typeof signInSchema>;
