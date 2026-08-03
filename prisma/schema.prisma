@@ -7,77 +7,110 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        String   @id
-  name      String
-  email     String   @unique
-  image     String?
+enum Plan {
+  FREE
+  PRO
+}
 
-  credits   Int      @default(10)
-  plan      String   @default("free")
+model User {
+  id    String  @id @default(cuid())
+  name  String
+  email String  @unique
+  image String?
+
+  credits Int  @default(10)
+  plan    Plan @default(FREE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Your application
+  // Application
   workspaces Workspace[]
 
   // Better Auth
   sessions Session[]
   accounts Account[]
+
+  @@index([email])
 }
 
 model Workspace {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  title     String   @default("Untitled Project")
+  title String @default("Untitled Project")
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  messages  Json      @default("[]")
-  fileData  Json?
+  messages Json  @default("[]")
+  fileData Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
+
 model Session {
-	id String @id
-	user User @relation(fields: [userId], references: [id])
-	userId String
-	token String @unique
-	expiresAt DateTime @db.Timestamptz(3)
-	ipAddress String?
-	userAgent String?
-	createdAt DateTime @db.Timestamptz(3)
-	updatedAt DateTime @db.Timestamptz(3)
-	@@map("session")
+  id String @id
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token String @unique
+
+  expiresAt DateTime @db.Timestamptz(3)
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("session")
 }
+
 model Account {
-	id String @id
-	user User @relation(fields: [userId], references: [id])
-	userId String
-	accountId String
-	providerId String
-	accessToken String?
-	refreshToken String?
-	accessTokenExpiresAt DateTime? @db.Timestamptz(3)
-	refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
-	scope String?
-	idToken String?
-	password String?
-	createdAt DateTime @db.Timestamptz(3)
-	updatedAt DateTime @db.Timestamptz(3)
-	@@map("account")
+  id String @id
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accountId  String
+  providerId String
+
+  accessToken  String?
+  refreshToken String?
+
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+
+  scope    String?
+  idToken  String?
+  password String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@index([providerId])
+  @@map("account")
 }
+
 model Verification {
-	id String @id
-	identifier String
-	value String
-	expiresAt DateTime @db.Timestamptz(3)
-	createdAt DateTime @db.Timestamptz(3)
-	updatedAt DateTime @db.Timestamptz(3)
-	@@map("verification")
+  id String @id
+
+  identifier String
+  value      String
+
+  expiresAt DateTime @db.Timestamptz(3)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([identifier, value])
+  @@index([identifier])
+  @@map("verification")
 }
