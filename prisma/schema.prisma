@@ -17,6 +17,7 @@ model User {
   name  String
   email String  @unique
   image String?
+  emailVerified   Boolean  @default(false)
 
   credits Int  @default(10)
   plan    Plan @default(FREE)
