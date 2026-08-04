@@ -1,6 +1,7 @@
-import React from 'react'
-
-const Workspace = () => {
+interface workspacePageProps{
+    searchParams:Promise<{prompt?:string,id?:string}>
+}
+const Workspace = ({searchParams}:workspacePageProps) => {
   return (
     <div>
       hello
