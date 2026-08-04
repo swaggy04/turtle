@@ -42,4 +42,4 @@ const BASE_DEPENDENCIES: Record<string, string> = {
   "tailwind-merge": "latest",
 };
 
-type Actiivetab = "preview" | "code" 
+type ActiiveTab = "preview" | "code" 
