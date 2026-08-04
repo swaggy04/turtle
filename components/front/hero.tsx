@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const placeholders = [
   "Build a SaaS CRM with authentication...",
@@ -13,13 +14,15 @@ const placeholders = [
 ];
 
 export default function Hero() {
+  const [prompt, setPrompt] = useState("");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPlaceholderIndex(
-        (prev) => (prev + 1) % placeholders.length
-      );
+      setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
     }, 2500);
 
     return () => clearInterval(interval);
@@ -59,15 +62,18 @@ export default function Hero() {
         {/* Description */}
 
         <p className="mt-8 max-w-3xl text-lg leading-8 text-muted-foreground lg:text-xl">
-          Describe your idea in plain English. Turtle generates
-          production-ready full-stack applications you can edit,
+          Describe your idea in plain English. Turtle generates production-ready full-stack applications you can edit,
           preview and deploy instantly.
         </p>
 
         {/* Prompt */}
 
         <div className="relative mx-auto mt-12 w-full max-w-2xl">
-         
+          className=
+          {cn(
+            "rounded-2xl border bg-[#111111] duration-200",
+            isFocused ? "border-white/20 ring-1 ring-white/8" : "border-white/8",
+          )}
         </div>
       </div>
     </section>
