@@ -1,4 +1,13 @@
 import { FileData, StatusStep } from "@/app/types/workspace";
+import { useState } from "react";
+import {SandpackProvider,
+  SandpackCodeEditor,
+  SandpackLayout,
+  SandpackPreview,
+  SandpackFileExplorer,
+  useSandpack
+} from "@codesandbox/sandpack-react"
+import {sandpackDark} from "@codesandbox/sandpack-themes"
 
 const PLACEHOLDER_FILES = {
   "/App.js": {
@@ -44,7 +53,7 @@ const BASE_DEPENDENCIES: Record<string, string> = {
   "tailwind-merge": "latest",
 };
 
-type ActiiveTab = "preview" | "code" 
+type ActiveTab = "preview" | "code" 
 
 
 interface CodePanelProps {
@@ -60,5 +69,26 @@ export function CodePanel({
   statusLog,
   onFilePatch,
 }: CodePanelProps) {
-  
+  const [activeTab, setActiveTab] = useState<ActiveTab>("preview")
+
+  const files = fileData?.files ?? PLACEHOLDER_FILES
+
+
+  const dependencies = {
+    ...BASE_DEPENDENCIES,
+    ...(fileData?.dependencies ?? {})
+  }
+  const filePathkey =Object.keys(files).sort().join("|")
+
+  return(
+    <div>
+      <SandpackProvider key={filePathkey}
+      template="react"
+      theme={sandpackDark}
+      files={files}
+      >
+
+      </SandpackProvider>
+    </div>
+  )
 }
