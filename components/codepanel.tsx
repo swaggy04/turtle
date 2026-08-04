@@ -1,3 +1,5 @@
+import { FileData, StatusStep } from "@/app/types/workspace";
+
 const PLACEHOLDER_FILES = {
   "/App.js": {
     code: `export default function App() {
@@ -43,3 +45,20 @@ const BASE_DEPENDENCIES: Record<string, string> = {
 };
 
 type ActiiveTab = "preview" | "code" 
+
+
+interface CodePanelProps {
+  fileData: FileData | null;
+  isGenerating: boolean;
+  statusLog: StatusStep[];
+  onFilePatch: (patches: FileData) => void;
+}
+
+export function CodePanel({
+  fileData,
+  isGenerating,
+  statusLog,
+  onFilePatch,
+}: CodePanelProps) {
+  
+}
