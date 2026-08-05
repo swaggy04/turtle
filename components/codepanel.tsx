@@ -1,13 +1,14 @@
 import { FileData, StatusStep } from "@/app/types/workspace";
 import { useState } from "react";
-import {SandpackProvider,
+import {
+  SandpackProvider,
   SandpackCodeEditor,
   SandpackLayout,
   SandpackPreview,
   SandpackFileExplorer,
-  useSandpack
-} from "@codesandbox/sandpack-react"
-import {sandpackDark} from "@codesandbox/sandpack-themes"
+  useSandpack,
+} from "@codesandbox/sandpack-react";
+import { sandpackDark } from "@codesandbox/sandpack-themes";
 
 const PLACEHOLDER_FILES = {
   "/App.js": {
@@ -53,8 +54,7 @@ const BASE_DEPENDENCIES: Record<string, string> = {
   "tailwind-merge": "latest",
 };
 
-type ActiveTab = "preview" | "code" 
-
+type ActiveTab = "preview" | "code";
 
 interface CodePanelProps {
   fileData: FileData | null;
@@ -63,32 +63,34 @@ interface CodePanelProps {
   onFilePatch: (patches: FileData) => void;
 }
 
-export function CodePanel({
-  fileData,
-  isGenerating,
-  statusLog,
-  onFilePatch,
-}: CodePanelProps) {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("preview")
+export function CodePanel({ fileData, isGenerating, statusLog, onFilePatch }: CodePanelProps) {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("preview");
 
-  const files = fileData?.files ?? PLACEHOLDER_FILES
-
+  const files = fileData?.files ?? PLACEHOLDER_FILES;
 
   const dependencies = {
     ...BASE_DEPENDENCIES,
-    ...(fileData?.dependencies ?? {})
-  }
-  const filePathkey =Object.keys(files).sort().join("|")
+    ...(fileData?.dependencies ?? {}),
+  };
+  const filePathkey = Object.keys(files).sort().join("|");
 
-  return(
+  return (
     <div>
-      <SandpackProvider key={filePathkey}
-      template="react"
-      theme={sandpackDark}
-      files={files}
-      >
-
-      </SandpackProvider>
+      <SandpackProvider
+        key={filePathkey}
+        template="react"
+        files={files}
+        theme={sandpackDark}
+        customSetup={{
+          dependencies,
+        }}
+        options={{
+          activeFile: "/App.js",
+          recompileMode: "delayed",
+          recompileDelay: 500,
+          autorun: true,
+        }}
+      ></SandpackProvider>
     </div>
-  )
+  );
 }
