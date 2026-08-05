@@ -79,16 +79,15 @@ export function CodePanel({ fileData, isGenerating, statusLog, onFilePatch }: Co
       <SandpackProvider
         key={filePathkey}
         template="react"
-        files={files}
         theme={sandpackDark}
+        files={files}
         customSetup={{
           dependencies,
         }}
         options={{
-          activeFile: "/App.js",
+          externalResources: ["https://cdn.tailwindcss.com"],
           recompileMode: "delayed",
           recompileDelay: 500,
-          autorun: true,
         }}
       ></SandpackProvider>
     </div>
