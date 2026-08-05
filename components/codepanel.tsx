@@ -63,6 +63,19 @@ interface CodePanelProps {
   onFilePatch: (patches: FileData) => void;
 }
 
+function SandpackInner({fileData,
+  activeTab,
+  setActiveTab,
+  isGenerating
+}:{
+  fileData:FileData | null
+  isGenerating:boolean
+  activeTab:ActiveTab
+  setActiveTab: (t:ActiveTab) => void
+}) {
+
+}
+
 export function CodePanel({ fileData, isGenerating, statusLog, onFilePatch }: CodePanelProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>("preview");
 
