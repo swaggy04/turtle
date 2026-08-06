@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { useAuth } from "../hooks/useAuth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import WorkspaceClient from "@/components/WorkspaceClient"
+import WorkspaceClient from "@/components/workspace/WorkspaceLayout"
 
 interface workspacePageProps{
     searchParams:Promise<{prompt?:string,id?:string}>
