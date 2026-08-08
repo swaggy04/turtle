@@ -12,11 +12,15 @@ interface WorkspaceProviderProps {
 
 export function WorkspaceProvider({
   children,
+  initialPrompt,
 }: WorkspaceProviderProps) {
-  const [state, dispatch] = useReducer(
-    workspaceReducer,
-    initialWorkspaceState
-  );
+const [state, dispatch] = useReducer(
+  workspaceReducer,
+  {
+    ...initialWorkspaceState,
+    prompt: initialPrompt ?? "",
+  }
+);
 
   return (
     <WorkspaceContext.Provider value={{ state, dispatch }}>
