@@ -46,6 +46,7 @@ ${prompt}
 `,
     config: {
       responseMimeType: "application/json",
+
       responseSchema: {
         type: "object",
         properties: {
@@ -71,6 +72,7 @@ ${prompt}
               ],
             },
           },
+
           dependencies: {
             type: "object",
             additionalProperties: {
@@ -78,13 +80,19 @@ ${prompt}
             },
           },
         },
-        required: ["files", "dependencies"],
+
+        required: [
+          "files",
+          "dependencies",
+        ],
       },
     },
   });
 
   if (!response.text) {
-    throw new Error("Gemini returned an empty response");
+    throw new Error(
+      "Gemini returned an empty response"
+    );
   }
 
   const parsed = JSON.parse(response.text);
