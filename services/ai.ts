@@ -37,7 +37,7 @@ export async function generateProject(
   prompt: string
 ): Promise<GeneratedProject> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.6-flash",
     contents: `
 ${SYSTEM_PROMPT}
 
