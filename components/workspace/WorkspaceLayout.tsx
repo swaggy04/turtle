@@ -1,3 +1,4 @@
+'use client'
 import { useWorkspace } from "./provider/WorkspaceContext";
 
 const WorkspaceClient = () => {
