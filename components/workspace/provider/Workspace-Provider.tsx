@@ -5,9 +5,9 @@ import { initialWorkspaceState } from "./initial";
 import { workspaceReducer } from "./WorkspaceReducer";
 import { WorkspaceContext } from "./WorkspaceContext";
 
-
 interface WorkspaceProviderProps {
   children: ReactNode;
+  initialPrompt?: string;
 }
 
 export function WorkspaceProvider({
