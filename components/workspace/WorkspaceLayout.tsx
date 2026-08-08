@@ -1,11 +1,15 @@
+import { useWorkspace } from "./provider/WorkspaceContext";
+
 const WorkspaceClient = () => {
+
+  const {state} = useWorkspace()
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-[#0a0a0a]">
       {/* Chat Panel */}
       <aside className="w-90 shrink-0 border-r border-white/10 bg-[#0d0d0d]">
         <div className="flex h-full items-center justify-center">
           <p className="text-sm text-white/30">
-            Chat panel coming soon
+            {state.prompt}
           </p>
         </div>
       </aside>
