@@ -5,9 +5,10 @@ import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { css } from "@codemirror/lang-css";
 import { markdown } from "@codemirror/lang-markdown";
-import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import { dracula } from "@uiw/codemirror-theme-dracula";
 
 import type { WorkspaceFile } from "./provider/workspace-types";
+import { useWorkspace } from "./provider/WorkspaceContext";
 
 interface CodeEditorProps {
   file: WorkspaceFile | null;
@@ -53,6 +54,8 @@ function getLanguageExtension(path: string) {
 }
 
 export function CodeEditor({ file }: CodeEditorProps) {
+  const { dispatch } = useWorkspace();
+
   if (!file) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -60,16 +63,28 @@ export function CodeEditor({ file }: CodeEditorProps) {
       </div>
     );
   }
+  const currentFile = file;
 
-  const language = getLanguageExtension(file.path);
+  const languageExtension = getLanguageExtension(file.path);
+
+  function handleChange(value: string) {
+    dispatch({
+      type: "UPDATE_FILE",
+      payload: {
+        path: currentFile.path,
+        code: value,
+      },
+    });
+  }
 
   return (
     <div className="h-full w-full">
       <CodeMirror
         value={file.code}
         height="100%"
-        theme={vscodeDark}
-        extensions={language ? [language] : []}
+        theme={dracula}
+        extensions={languageExtension ? [languageExtension] : []}
+        onChange={handleChange}
         basicSetup={{
           lineNumbers: true,
           foldGutter: true,
