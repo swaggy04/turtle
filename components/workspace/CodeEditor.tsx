@@ -1,7 +1,7 @@
 "use client";
 
 import Editor from "@monaco-editor/react";
-import type { WorkspaceFile } from "./workspace-types";
+import { WorkspaceFile } from "./provider/workspace-types";
 
 interface CodeEditorProps {
   file: WorkspaceFile | null;
