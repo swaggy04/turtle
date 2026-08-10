@@ -1,8 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import {
-  generatedProjectSchema,
-  type GeneratedProject,
-} from "./ai-schema";
+import { generatedProjectSchema, type GeneratedProject } from "./ai-schema";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -33,10 +30,32 @@ Rules:
 7. Keep the generated application reasonably small.
 `;
 
-export async function generateProject(
-  prompt: string
-): Promise<GeneratedProject> {
-  const response = await ai.models.generateContent({
+async function generateWithRetry(request: Parameters<typeof ai.models.generateContent>[0], maxRetries = 3) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await ai.models.generateContent(request);
+    } catch (error: unknown) {
+      const status =
+        typeof error === "object" && error !== null && "status" in error && typeof error.status === "number"
+          ? error.status
+          : undefined;
+
+      const isRetryable = status === 408 || status === 429 || status === 503 || (status !== undefined && status >= 500);
+
+      if (!isRetryable || attempt === maxRetries) {
+        throw error;
+      }
+
+      const delay = 1000 * Math.pow(2, attempt);
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw new Error("Gemini generation failed");
+}
+export async function generateProject(prompt: string): Promise<GeneratedProject> {
+  const response = await generateWithRetry({
     model: "gemini-3.6-flash",
     contents: `
 ${SYSTEM_PROMPT}
@@ -65,11 +84,7 @@ ${prompt}
                   type: "string",
                 },
               },
-              required: [
-                "path",
-                "code",
-                "language",
-              ],
+              required: ["path", "code", "language"],
             },
           },
 
@@ -81,18 +96,13 @@ ${prompt}
           },
         },
 
-        required: [
-          "files",
-          "dependencies",
-        ],
+        required: ["files", "dependencies"],
       },
     },
   });
 
   if (!response.text) {
-    throw new Error(
-      "Gemini returned an empty response"
-    );
+    throw new Error("Gemini returned an empty response");
   }
 
   const parsed = JSON.parse(response.text);

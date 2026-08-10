@@ -103,9 +103,8 @@ const WorkspaceClient = () => {
 
   return (
     <div className="flex h-full overflow-hidden">
-      {/* ========================= */}
+    
       {/* Chat Panel */}
-      {/* ========================= */}
 
       <aside className="flex w-[400px] shrink-0 flex-col border-r border-white/10">
         {/* Chat Header */}
