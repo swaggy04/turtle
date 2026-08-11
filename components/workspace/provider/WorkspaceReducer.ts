@@ -1,11 +1,7 @@
-
 import { WorkspaceState } from "./workspace-types";
 import { WorkspaceAction } from "./WorkspaceAction";
 
-export function workspaceReducer(
-  state: WorkspaceState,
-  action: WorkspaceAction
-): WorkspaceState {
+export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction): WorkspaceState {
   switch (action.type) {
     case "UPDATE_PROMPT":
       return {
@@ -68,6 +64,11 @@ export function workspaceReducer(
           ...state.runtime,
           error: action.payload,
         },
+      };
+    case "SET_VIEW":
+      return {
+        ...state,
+        view: action.payload,
       };
 
     default:
