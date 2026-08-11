@@ -2,6 +2,7 @@ import type {
   WorkspaceFile,
   WorkspaceMessage,
   WorkspaceStatus,
+  WorkspaceView,
 } from "./workspace-types";
 
 export type WorkspaceAction =
@@ -42,4 +43,8 @@ export type WorkspaceAction =
   | {
       type: "SET_RUNTIME_ERROR";
       payload: string | null;
+    }
+  | {
+      type: "SET_VIEW";
+      payload: WorkspaceView;
     };
