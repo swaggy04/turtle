@@ -17,4 +17,5 @@ export const initialWorkspaceState: WorkspaceState = {
     compiling: false,
     error: null,
   },
+  view:"code"
 };
