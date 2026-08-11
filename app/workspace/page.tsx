@@ -26,7 +26,7 @@ export default async function Workspace({
 
   return (
     <WorkspaceProvider initialPrompt={prompt ?? ""}>
-      <main className="h-[calc(100vh-4rem)]  w-full overflow-hidden">
+      <main className="h-[calc(100dvh-4rem)] min-h-0  w-full overflow-hidden">
         <WorkspaceClient />
       </main>
     </WorkspaceProvider>

@@ -78,10 +78,11 @@ export function CodeEditor({ file }: CodeEditorProps) {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full min-h-0 w-full overflow-hidden">
       <CodeMirror
         value={file.code}
         height="100%"
+        className="h-full"
         theme={dracula}
         extensions={languageExtension ? [languageExtension] : []}
         onChange={handleChange}
