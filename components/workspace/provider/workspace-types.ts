@@ -1,16 +1,9 @@
-// components/workspace/workspace-types.ts
-
 /**
  * Current generation lifecycle of a workspace.
  */
-export type WorkspaceStatus =
-  | "idle"
-  | "planning"
-  | "generating"
-  | "ready"
-  | "patching"
-  | "error";
+export type WorkspaceStatus = "idle" | "planning" | "generating" | "ready" | "patching" | "error";
 
+export type WorkspaceView = "code" | "preview";
 /**
  * A single source file inside the workspace.
  */
@@ -55,4 +48,6 @@ export interface WorkspaceState {
   messages: WorkspaceMessage[];
 
   runtime: WorkspaceRuntime;
+
+  view: WorkspaceView;
 }
