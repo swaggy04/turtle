@@ -11,7 +11,9 @@ interface WorkspacePageProps {
   }>;
 }
 
-export default async function Workspace({ searchParams }: WorkspacePageProps) {
+export default async function Workspace({
+  searchParams,
+}: WorkspacePageProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -20,11 +22,13 @@ export default async function Workspace({ searchParams }: WorkspacePageProps) {
     redirect("/sign-in");
   }
 
-  const { prompt, id } = await searchParams;
+  const { prompt } = await searchParams;
 
   return (
     <WorkspaceProvider initialPrompt={prompt ?? ""}>
-      <WorkspaceClient />
+      <main className="h-[calc(100vh-4rem)]  w-full overflow-hidden">
+        <WorkspaceClient />
+      </main>
     </WorkspaceProvider>
   );
 }
