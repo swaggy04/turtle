@@ -6,6 +6,7 @@ import { GenerateWorkspace } from "./generateWorkspace";
 import { FileExplorer } from "./FileExplorer";
 import { CodeEditor } from "./CodeEditor";
 import { WorkspaceViewToggle } from "./WorkspaceViewToggle";
+import { Preview } from "./Preview";
 
 const WorkspaceClient = () => {
   const { state, dispatch } = useWorkspace();
@@ -248,17 +249,7 @@ const WorkspaceClient = () => {
                 {/* PREVIEW VIEW */}
                 {/* ========================= */}
 
-                {state.view === "preview" && (
-                  <div className="h-full w-full overflow-hidden bg-white">
-                    <div className="flex h-full items-center justify-center">
-                      <div className="text-center">
-                        <p className="text-sm text-black/60">Preview</p>
-
-                        <p className="mt-2 text-xs text-black/40">Your generated application will appear here.</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {state.view === "preview" && <Preview />}
               </>
             )}
           </div>
