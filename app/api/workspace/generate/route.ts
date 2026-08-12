@@ -26,7 +26,8 @@ export async function POST(request: Request) {
     return NextResponse.json(project);
   } catch (error) {
     console.error("Project generation failed:", error);
+    const message = error instanceof Error ? error.message : String(error);
 
-    return NextResponse.json({ error: "Failed to generate project" }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

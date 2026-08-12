@@ -55,7 +55,6 @@ async function generateWithRetry(
 
       const retryable =
         status === 408 ||
-        status === 429 ||
         status === 503 ||
         (status !== undefined && status >= 500);
 
