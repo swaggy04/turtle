@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
+import { generateProject } from "@/services/ai/generator";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { generateProject } from "@/services/ai";
+
 
 export async function POST(request: Request) {
   const session = await auth.api.getSession({
