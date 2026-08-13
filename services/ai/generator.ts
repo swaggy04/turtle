@@ -1,9 +1,6 @@
-import type { AIProvider } from "./provider";
-import { OllamaProvider } from "./ollama";
+import { getProvider } from "./registry";
+import { GenerateProjectOptions } from "./provider";
 
-
-const provider: AIProvider = new OllamaProvider();
-
-export function generateProject(prompt: string) {
-  return provider.generateProject(prompt);
+export function generateProject(options: GenerateProjectOptions) {
+  return getProvider(options.provider).generateProject(options);
 }
