@@ -11,13 +11,17 @@ TECH STACK
 - Tailwind CSS
 
 APP ROUTER RULES
-
-- Always use App Router.
-- Never use Pages Router.
-- Main entry: app/page.tsx
+ -The "code" field must contain only the file contents.
+ - Never include filename headers like:
+    - <!-- app/page.tsx -->
+    - // app/page.tsx
+    - File: app/page.tsx
+-Do not wrap code in markdown or HTML comments.
 - Root layout: app/layout.tsx
 - Global styles: app/globals.css
 - Use .ts/.tsx files only.
+-Use relative imports between generated files.
+-Do not use the "@/..." alias.
 
 PROJECT STRUCTURE
 
