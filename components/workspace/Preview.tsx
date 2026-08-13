@@ -3,37 +3,58 @@
 import {
   SandpackProvider,
   SandpackPreview,
+  SandpackLayout,
 } from "@codesandbox/sandpack-react";
-
+import { useMemo } from "react";
 import { useWorkspace } from "./provider/WorkspaceContext";
 
 export function Preview() {
   const { state } = useWorkspace();
 
-  const files = Object.fromEntries(
-    Object.values(state.files).map((file) => [
-      `/${file.path}`,
-      {
-        code: file.code,
-      },
-    ])
-  );
+const sandpackFiles = useMemo(() => {
+  const files: Record<string, { code: string; active?: boolean }> = {};
+
+  Object.values(state.files).forEach((file) => {
+    files[`/${file.path}`] = {
+      code: file.code,
+    };
+  });
+
+  if (state.activeFile) {
+    const key = `/${state.activeFile}`;
+    if (files[key]) {
+      files[key].active = true;
+    }
+  }
+
+  return files;
+}, [state.files, state.activeFile]);
+
+  if (Object.keys(sandpackFiles).length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-white/50">
+        Waiting for generated files...
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full w-full overflow-hidden bg-white">
+    <div className="h-full overflow-hidden rounded-xl border border-white/10">
       <SandpackProvider
-        template="react"
-        files={files}
-        customSetup={{
-          dependencies: state.dependencies,
-        }}
+        template="nextjs"
+        files={sandpackFiles}
+         customSetup={{
+    dependencies: state.dependencies,
+  }}
+        theme="dark"
       >
-        <SandpackPreview
-          style={{
-            height: "100%",
-            width: "100%",
-          }}
-        />
+        <SandpackLayout style={{ height: "100%" }}>
+          <SandpackPreview
+            showOpenInCodeSandbox={false}
+            showRefreshButton
+            style={{ height: "100%" }}
+          />
+        </SandpackLayout>
       </SandpackProvider>
     </div>
   );

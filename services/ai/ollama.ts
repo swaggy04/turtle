@@ -1,77 +1,83 @@
-
 import { GeneratedProject, generatedProjectSchema } from "../ai-schema";
 import type { AIProvider } from "./provider";
 
 const OLLAMA_URL = "http://localhost:11434/api/generate";
-
-
 const MODEL = "qwen2.5-coder:3b";
 
 const SYSTEM_PROMPT = `
-You are Turtle, an AI full-stack application builder.
+You are Turtle, an expert AI full-stack application builder.
 
-Generate a complete, small, runnable web application from the user's request.
+Your job is to generate COMPLETE, runnable Next.js applications.
 
-TECHNOLOGY REQUIREMENTS:
+TECH STACK
 
 - Next.js App Router
 - React
 - TypeScript
 - Tailwind CSS
 
-NEXT.JS REQUIREMENTS:
+APP ROUTER RULES
 
-1. ALWAYS use the Next.js App Router.
-2. NEVER use the Pages Router.
-3. NEVER create pages/index.tsx.
-4. The main page MUST be:
-   app/page.tsx
-5. If the application needs a root layout, create:
-   app/layout.tsx
-6. Global styles MUST be:
-   app/globals.css
-7. Use TypeScript files (.ts / .tsx).
-8. Do not generate JavaScript versions of TypeScript files.
-9. Do not generate unnecessary configuration files.
+- Always use App Router.
+- Never use Pages Router.
+- Main entry: app/page.tsx
+- Root layout: app/layout.tsx
+- Global styles: app/globals.css
+- Use .ts/.tsx files only.
 
-GENERATED FILE REQUIREMENTS:
+PROJECT STRUCTURE
 
-Every file must contain:
+Every project MUST include:
+
+- app/layout.tsx
+- app/page.tsx
+- app/globals.css
+
+When the UI contains sections like navbar, hero, footer, cards, forms,
+sidebars, or lists, split them into reusable components.
+
+Example:
+
+components/
+- Navbar.tsx
+- Hero.tsx
+- TodoList.tsx
+- Footer.tsx
+
+Never put everything inside app/page.tsx unless the user explicitly asks for a single-file example.
+
+FILE FORMAT
+
+Every file MUST contain:
 
 - path
 - code
 - language
 
-The file paths must represent a valid Next.js App Router project.
+DEPENDENCIES
 
-DEPENDENCIES:
-
-- Include only packages actually imported by the generated code.
+- Include only packages actually imported.
+- Do not invent packages.
 - Do not include unnecessary packages.
 - Do not include @types/tailwindcss.
-- React and Next.js dependencies must use modern compatible versions.
-- Do not invent packages.
 
-CODE REQUIREMENTS:
+CODE QUALITY
 
-- Code must be complete.
-- Code must be internally consistent.
-- Imports must point to files that actually exist.
-- Components must be correctly exported and imported.
-- Do not use undefined components.
-- Do not use undefined variables.
-- Avoid unnecessary complexity.
-- Keep the application reasonably small.
+- Produce production-ready code.
+- Imports must reference existing files.
+- Components must be exported correctly.
+- Avoid placeholder text like "Hello World" unless explicitly requested.
+- Keep the project reasonably small but complete.
 
-OUTPUT REQUIREMENTS:
+OUTPUT
 
-Return ONLY valid JSON matching the provided schema.
+Return ONLY valid JSON matching the schema.
 
-Do NOT return:
+Never return:
+
 - Markdown
 - Code fences
 - Explanations
-- Comments outside the generated code
 `;
 
 const generatedProjectFormat = {
@@ -82,20 +88,13 @@ const generatedProjectFormat = {
       items: {
         type: "object",
         properties: {
-          path: {
-            type: "string",
-          },
-          code: {
-            type: "string",
-          },
-          language: {
-            type: "string",
-          },
+          path: { type: "string" },
+          code: { type: "string" },
+          language: { type: "string" },
         },
         required: ["path", "code", "language"],
       },
     },
-
     dependencies: {
       type: "object",
       additionalProperties: {
@@ -103,7 +102,6 @@ const generatedProjectFormat = {
       },
     },
   },
-
   required: ["files", "dependencies"],
 };
 
@@ -114,33 +112,31 @@ export class OllamaProvider implements AIProvider {
       headers: {
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify({
         model: MODEL,
-
         system: SYSTEM_PROMPT,
-
         prompt: `
+Build a complete production-ready Next.js App Router project.
+
 User request:
-
 ${prompt}
+
+Requirements:
+- Generate all required files.
+- Split the UI into reusable components whenever appropriate.
+- Return valid JSON only.
 `,
-
         format: generatedProjectFormat,
-
         stream: false,
-
         options: {
-          temperature: 0,
+          temperature: 0.2,
         },
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-
       throw new Error(
-        `Ollama request failed (${response.status}): ${errorText}`,
+        `Ollama request failed (${response.status}): ${await response.text()}`
       );
     }
 
@@ -157,12 +153,9 @@ ${prompt}
     } catch {
       console.error("Invalid JSON returned by Ollama:");
       console.error(data.response);
-
       throw new Error("Ollama returned invalid JSON");
     }
 
-    // Final safety boundary:
-    // AI output must match our application schema.
     return generatedProjectSchema.parse(parsed);
   }
 }
