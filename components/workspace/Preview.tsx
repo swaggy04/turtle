@@ -31,14 +31,6 @@ export function Preview() {
     return files;
   }, [state.files, state.activeFile]);
 
-  // Force Sandpack to recreate the project whenever the generated files change.
-  const sandpackKey = useMemo(() => {
-    return Object.values(state.files)
-      .map((file) => `${file.path}:${file.code.length}`)
-      .sort()
-      .join("|");
-  }, [state.files]);
-
   if (Object.keys(sandpackFiles).length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-sm text-white/50">
@@ -47,16 +39,23 @@ export function Preview() {
     );
   }
 
+  // Temporary debug logs
+  console.log("Sandpack files:", sandpackFiles);
+  console.log("app/page.tsx:", sandpackFiles["/app/page.tsx"]?.code);
+
   return (
     <div className="h-full overflow-hidden rounded-xl border border-white/10">
       <SandpackProvider
-        key={sandpackKey}
         template="nextjs"
         files={sandpackFiles}
         customSetup={{
           dependencies: state.dependencies,
         }}
         theme="dark"
+        options={{
+          recompileMode: "immediate",
+          recompileDelay: 0,
+        }}
       >
         <SandpackLayout style={{ height: "100%" }}>
           <SandpackPreview
