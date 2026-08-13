@@ -1,3 +1,5 @@
+import { AIProviderName } from "@/services/ai/provider";
+
 /**
  * Current generation lifecycle of a workspace.
  */
@@ -42,6 +44,8 @@ export interface WorkspaceState {
   files: Record<string, WorkspaceFile>;
 
   dependencies: Record<string, string>;
+  provider: AIProviderName;
+  model: string;
 
   activeFile: string | null;
 

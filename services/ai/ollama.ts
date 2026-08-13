@@ -1,8 +1,7 @@
 import { GeneratedProject, generatedProjectSchema } from "../ai-schema";
-import type { AIProvider } from "./provider";
+import type { AIProvider, GenerateProjectOptions } from "./provider";
 
 const OLLAMA_URL = "http://localhost:11434/api/generate";
-const MODEL = "qwen2.5-coder:3b";
 
 const SYSTEM_PROMPT = `
 You are Turtle, an expert AI full-stack application builder.
@@ -106,20 +105,20 @@ const generatedProjectFormat = {
 };
 
 export class OllamaProvider implements AIProvider {
-  async generateProject(prompt: string): Promise<GeneratedProject> {
+  async generateProject(options: GenerateProjectOptions): Promise<GeneratedProject> {
     const response = await fetch(OLLAMA_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: MODEL,
+        model: options.model,
         system: SYSTEM_PROMPT,
         prompt: `
 Build a complete production-ready Next.js App Router project.
 
 User request:
-${prompt}
+${options.prompt}
 
 Requirements:
 - Generate all required files.
@@ -135,9 +134,7 @@ Requirements:
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Ollama request failed (${response.status}): ${await response.text()}`
-      );
+      throw new Error(`Ollama request failed (${response.status}): ${await response.text()}`);
     }
 
     const data = await response.json();

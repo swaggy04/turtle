@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
-
+import { AVAILABLE_MODELS } from "@/services/ai/models";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const placeholders = [
   "Build a SaaS CRM with authentication...",
@@ -23,6 +24,7 @@ export default function Hero() {
   const [prompt, setPrompt] = useState("");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("qwen2.5-coder:3b");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -38,8 +40,7 @@ export default function Hero() {
     if (!textareaRef.current) return;
 
     textareaRef.current.style.height = "0px";
-    textareaRef.current.style.height =
-      textareaRef.current.scrollHeight + "px";
+    textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
   }, [prompt]);
 
   const handleSubmit = () => {
@@ -50,14 +51,16 @@ export default function Hero() {
       return;
     }
 
+    const selected = AVAILABLE_MODELS.find((m) => m.id === selectedModel);
+
     router.push(
-      `/workspace?prompt=${encodeURIComponent(prompt.trim())}`
+      `/workspace?prompt=${encodeURIComponent(prompt.trim())}&provider=${selected?.provider}&model=${encodeURIComponent(
+        selectedModel,
+      )}`,
     );
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -77,44 +80,34 @@ export default function Hero() {
 
       <div className="relative mx-auto flex max-w-6xl flex-col items-center px-6 text-center">
         {/* Badge */}
-
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-sm backdrop-blur">
           <Sparkles className="h-4 w-4 text-emerald-500" />
           AI Powered Full Stack Builder
         </div>
 
         {/* Heading */}
-
         <h1 className="max-w-5xl text-5xl font-black leading-[0.9] tracking-tight sm:text-7xl lg:text-[7rem]">
           Build AI apps
           <br />
-
           <span className="bg-linear-to-r from-white via-zinc-400 to-emerald-500 bg-clip-text text-transparent">
             from a single
           </span>
-
           <br />
-
           prompt.
         </h1>
 
         {/* Description */}
-
         <p className="mt-8 max-w-3xl text-lg leading-8 text-muted-foreground lg:text-xl">
-          Describe your idea in plain English. Turtle generates
-          production-ready full-stack applications you can edit,
+          Describe your idea in plain English. Turtle generates production-ready full-stack applications you can edit,
           preview and deploy instantly.
         </p>
 
         {/* Prompt */}
-
         <div className="relative mx-auto mt-14 w-full max-w-3xl">
           <div
             className={cn(
               "rounded-2xl border bg-[#111111] transition-all duration-200",
-              isFocused
-                ? "border-white/20 ring-1 ring-white/10"
-                : "border-white/10"
+              isFocused ? "border-white/20 ring-1 ring-white/10" : "border-white/10",
             )}
           >
             <textarea
@@ -129,24 +122,26 @@ export default function Hero() {
               className="min-h-35 w-full resize-none bg-transparent px-6 py-6 text-lg text-white outline-none placeholder:text-zinc-500"
             />
 
-            <div className="flex items-center justify-between border-t border-white/10 p-4">
-              <span className="text-sm text-zinc-500">
-                Press{" "}
-                <kbd className="rounded border border-white/10 px-2 py-1">
-                  Shift
-                </kbd>{" "}
-                +{" "}
-                <kbd className="rounded border border-white/10 px-2 py-1">
-                  Enter
-                </kbd>{" "}
-                for newline
-              </span>
+            <div className="flex flex-col gap-3 border-t border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <Select value={selectedModel} onValueChange={(value) => value && setSelectedModel(value)}>
+                  <SelectTrigger className="h-9 w-[240px] border-white/10 bg-[#181818] text-white">
+                    <SelectValue />
+                  </SelectTrigger>
 
-              <Button
-                onClick={handleSubmit}
-                disabled={!prompt.trim()}
-                className="rounded-xl px-6"
-              >
+                  <SelectContent>
+                    {AVAILABLE_MODELS.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <span className="hidden text-xs text-zinc-500 sm:block">Shift + Enter for newline</span>
+              </div>
+
+              <Button onClick={handleSubmit} disabled={!prompt.trim()} className="rounded-xl px-6">
                 Generate
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -155,20 +150,9 @@ export default function Hero() {
         </div>
 
         {/* Bottom Pills */}
-
         <div className="mt-10 flex flex-wrap justify-center gap-3 text-sm text-muted-foreground">
-          {[
-            "Next.js",
-            "React",
-            "Prisma",
-            "Postgres",
-            "Docker",
-            "AI Agents",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-full border border-border/60 bg-background/50 px-4 py-2"
-            >
+          {["Next.js", "React", "Prisma", "Postgres", "Docker", "AI Agents"].map((item) => (
+            <div key={item} className="rounded-full border border-border/60 bg-background/50 px-4 py-2">
               {item}
             </div>
           ))}

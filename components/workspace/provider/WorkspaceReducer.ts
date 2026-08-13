@@ -14,6 +14,12 @@ export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction)
         ...state,
         status: "generating",
       };
+    case "SET_MODEL":
+      return {
+        ...state,
+        provider: action.payload.provider,
+        model: action.payload.model,
+      };
 
     case "SET_STATUS":
       return {

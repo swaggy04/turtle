@@ -12,10 +12,11 @@ export const initialWorkspaceState: WorkspaceState = {
   activeFile: null,
 
   messages: [],
-
+  provider: "ollama",
+  model: "qwen2.5-coder:3b",
   runtime: {
     compiling: false,
     error: null,
   },
-  view:"code"
+  view: "code",
 };

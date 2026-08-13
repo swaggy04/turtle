@@ -5,7 +5,17 @@ interface GeneratedProject {
   dependencies: Record<string, string>;
 }
 
-export async function GenerateWorkspace(prompt: string): Promise<GeneratedProject> {
+interface GenerateWorkspaceOptions {
+  prompt: string;
+  provider: "ollama" | "gemini";
+  model: string;
+}
+
+export async function GenerateWorkspace({
+  prompt,
+  provider,
+  model,
+}: GenerateWorkspaceOptions): Promise<GeneratedProject> {
   const response = await fetch("/api/workspace/generate", {
     method: "POST",
     headers: {
@@ -13,20 +23,17 @@ export async function GenerateWorkspace(prompt: string): Promise<GeneratedProjec
     },
     body: JSON.stringify({
       prompt,
+      provider,
+      model,
     }),
   });
+
   if (!response.ok) {
- const errorBody = await response.text();
+    const errorBody = await response.text();
 
-  console.error(
-    "Generate workspace failed:",
-    response.status,
-    errorBody
-  );
+    console.error("Generate workspace failed:", response.status, errorBody);
 
-  throw new Error(
-    `Failed to generate workspace (${response.status}): ${errorBody}`
-  );
+    throw new Error(`Failed to generate workspace (${response.status}): ${errorBody}`);
   }
 
   return response.json();

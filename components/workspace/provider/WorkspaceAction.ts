@@ -1,9 +1,6 @@
-import type {
-  WorkspaceFile,
-  WorkspaceMessage,
-  WorkspaceStatus,
-  WorkspaceView,
-} from "./workspace-types";
+
+import { AIProviderName } from "@/services/ai/types";
+import type { WorkspaceFile, WorkspaceMessage, WorkspaceStatus, WorkspaceView } from "./workspace-types";
 
 export type WorkspaceAction =
   | {
@@ -43,6 +40,13 @@ export type WorkspaceAction =
   | {
       type: "SET_RUNTIME_ERROR";
       payload: string | null;
+    }
+  | {
+      type: "SET_MODEL";
+      payload: {
+        provider: AIProviderName;
+        model: string;
+      };
     }
   | {
       type: "SET_VIEW";
