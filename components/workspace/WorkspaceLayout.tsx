@@ -10,7 +10,6 @@ import { FileExplorer } from "./FileExplorer";
 import { CodeEditor } from "./CodeEditor";
 import { WorkspaceViewToggle } from "./WorkspaceViewToggle";
 import { ModelSelector } from "./ModelSelector";
-import Preview from "./preview/Preview";
 
 import type { AIProviderName } from "@/services/ai/types";
 import type { GeneratedProject } from "@/services/ai-schema";
@@ -218,7 +217,10 @@ const WorkspaceClient = () => {
                     </div>
                   )
                 ) : (
-                  <Preview project={runtimeProject} />
+                  // <Preview project={runtimeProject} />
+                  <div>
+                    previw will be soon
+                  </div>
                 )}
               </>
             )}
