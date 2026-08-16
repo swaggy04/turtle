@@ -10,8 +10,10 @@ import { FileExplorer } from "./FileExplorer";
 import { CodeEditor } from "./CodeEditor";
 import { WorkspaceViewToggle } from "./WorkspaceViewToggle";
 import { ModelSelector } from "./ModelSelector";
+import Preview from "./preview/Preview";
 
 import type { AIProviderName } from "@/services/ai/types";
+import type { GeneratedProject } from "@/services/ai-schema";
 
 const WorkspaceClient = () => {
   const { state, dispatch } = useWorkspace();
@@ -22,8 +24,7 @@ const WorkspaceClient = () => {
   // Initialize workspace from URL
   useEffect(() => {
     const prompt = searchParams.get("prompt") ?? "";
-    const provider =
-      (searchParams.get("provider") as AIProviderName | null) ?? "ollama";
+    const provider = (searchParams.get("provider") as AIProviderName | null) ?? "ollama";
     const model = searchParams.get("model") ?? "qwen2.5-coder:3b";
 
     dispatch({
@@ -60,9 +61,7 @@ const WorkspaceClient = () => {
           model: state.model,
         });
 
-        const files = Object.fromEntries(
-          project.files.map((file) => [file.path, file])
-        );
+        const files = Object.fromEntries(project.files.map((file) => [file.path, file]));
 
         dispatch({
           type: "REPLACE_FILES",
@@ -93,6 +92,19 @@ const WorkspaceClient = () => {
 
   const activeFile = state.activeFile ? state.files[state.activeFile] : null;
 
+  // Convert workspace state back into the GeneratedProject shape
+  const runtimeProject: GeneratedProject | null =
+    Object.keys(state.files).length === 0
+      ? null
+      : {
+          files: Object.values(state.files).map((file) => ({
+            path: file.path,
+            code: file.code,
+            language: file.language,
+          })),
+          dependencies: state.dependencies,
+        };
+
   return (
     <div className="flex h-full min-h-0 w-full overflow-hidden">
       {/* Chat Panel */}
@@ -107,9 +119,7 @@ const WorkspaceClient = () => {
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
           <div>
             <p className="text-xs text-white/40">Prompt</p>
-            <p className="mt-2 text-sm leading-6 text-white">
-              {state.prompt}
-            </p>
+            <p className="mt-2 text-sm leading-6 text-white">{state.prompt}</p>
           </div>
 
           <div className="mt-8">
@@ -119,26 +129,20 @@ const WorkspaceClient = () => {
 
           {state.status === "generating" && (
             <div className="mt-8">
-              <p className="text-sm text-white/50">
-                Turtle is building your application...
-              </p>
+              <p className="text-sm text-white/50">Turtle is building your application...</p>
             </div>
           )}
 
           {state.status === "error" && (
             <div className="mt-8">
-              <p className="text-sm text-red-400">
-                Something went wrong while generating your application.
-              </p>
+              <p className="text-sm text-red-400">Something went wrong while generating your application.</p>
             </div>
           )}
 
           {state.status === "ready" && (
             <div className="mt-8">
               <p className="text-xs text-white/40">Generation</p>
-              <p className="mt-2 text-sm text-emerald-400">
-                Application generated successfully.
-              </p>
+              <p className="mt-2 text-sm text-emerald-400">Application generated successfully.</p>
             </div>
           )}
         </div>
@@ -172,13 +176,9 @@ const WorkspaceClient = () => {
           <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 px-4">
             <div className="min-w-0">
               {state.view === "code" && activeFile ? (
-                <span className="block truncate font-mono text-xs text-white/60">
-                  {activeFile.path}
-                </span>
+                <span className="block truncate font-mono text-xs text-white/60">{activeFile.path}</span>
               ) : (
-                <span className="text-sm text-white/40">
-                  {state.view === "code" ? "Code Editor" : "Preview"}
-                </span>
+                <span className="text-sm text-white/40">{state.view === "code" ? "Code Editor" : "Preview"}</span>
               )}
             </div>
 
@@ -188,9 +188,7 @@ const WorkspaceClient = () => {
           <div className="min-h-0 flex-1 overflow-hidden">
             {state.status === "generating" && (
               <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-white/30">
-                  Generating application...
-                </p>
+                <p className="text-sm text-white/30">Generating application...</p>
               </div>
             )}
 
@@ -202,9 +200,7 @@ const WorkspaceClient = () => {
 
             {state.status === "idle" && (
               <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-white/30">
-                  Waiting for generation...
-                </p>
+                <p className="text-sm text-white/30">Waiting for generation...</p>
               </div>
             )}
 
@@ -216,24 +212,13 @@ const WorkspaceClient = () => {
                   ) : (
                     <div className="flex h-full items-center justify-center">
                       <div className="text-center">
-                        <p className="text-sm text-white/50">
-                          Select a file to view its code.
-                        </p>
-                        <p className="mt-2 text-xs text-white/30">
-                          Choose a file from the explorer.
-                        </p>
+                        <p className="text-sm text-white/50">Select a file to view its code.</p>
+                        <p className="mt-2 text-xs text-white/30">Choose a file from the explorer.</p>
                       </div>
                     </div>
                   )
                 ) : (
-                  <div className="flex h-full items-center justify-center bg-[#0a0a0a]">
-                    <div className="text-center">
-                      <p className="text-sm text-white/60">Preview</p>
-                      <p className="mt-2 text-xs text-white/40">
-                        WebContainer preview coming next...
-                      </p>
-                    </div>
-                  </div>
+                  <Preview project={runtimeProject} />
                 )}
               </>
             )}
