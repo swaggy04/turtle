@@ -13,6 +13,7 @@ import { ModelSelector } from "./ModelSelector";
 
 import type { AIProviderName } from "@/services/ai/types";
 import type { GeneratedProject } from "@/services/ai-schema";
+import Preview from "./preview/Preview";
 
 const WorkspaceClient = () => {
   const { state, dispatch } = useWorkspace();
@@ -217,10 +218,7 @@ const WorkspaceClient = () => {
                     </div>
                   )
                 ) : (
-                  // <Preview project={runtimeProject} />
-                  <div>
-                    previw will be soon
-                  </div>
+                  <Preview />
                 )}
               </>
             )}
