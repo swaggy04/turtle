@@ -29,7 +29,7 @@ const REQUIRED_FILES: GeneratedFile[] = [
         },
       },
       null,
-      2
+      2,
     ),
   },
   {
@@ -55,7 +55,7 @@ const REQUIRED_FILES: GeneratedFile[] = [
         exclude: ["node_modules"],
       },
       null,
-      2
+      2,
     ),
   },
   {
@@ -94,9 +94,7 @@ export default config;`,
   },
 ];
 
-export function ensureProjectScaffold(
-  project: GeneratedProject
-): GeneratedProject {
+export function ensureProjectScaffold(project: GeneratedProject): GeneratedProject {
   const files = [...project.files];
 
   for (const required of REQUIRED_FILES) {

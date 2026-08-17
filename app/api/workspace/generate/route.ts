@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { generateProject } from "@/services/ai/generator";
 import type { AIProviderName } from "@/services/ai/provider";
+import { ensureProjectScaffold } from "@/services/ensure-project-scaffold";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -38,7 +39,9 @@ export async function POST(request: Request) {
       model: model.trim(),
     });
 
-    return NextResponse.json(project);
+    const completedProject = ensureProjectScaffold(project);
+
+    return NextResponse.json(completedProject);
   } catch (error) {
     console.error("Project generation failed:", error);
 
