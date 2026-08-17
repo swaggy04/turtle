@@ -1,5 +1,7 @@
 "use client";
+
 import { useEffect, useState } from "react";
+
 import type { RuntimeState } from "@/types/runtime";
 import WebContainerManager from "./webcontainermanager";
 
@@ -18,12 +20,21 @@ export function useRuntime() {
 
     async function boot() {
       try {
-        setRuntime((prev) => ({ ...prev, status: "booting" }));
+        // Tell the UI that boot has started
+        setRuntime((prev) => ({
+          ...prev,
+          status: "booting",
+        }));
 
+        // Get (or create) the single WebContainer instance
         await WebContainerManager.getInstance();
 
+        // Don't update state if the component has already unmounted
         if (!cancelled) {
-          setRuntime((prev) => ({ ...prev, status: "idle" }));
+          setRuntime((prev) => ({
+            ...prev,
+            status: "idle", // We'll later change this to "ready"
+          }));
         }
       } catch (err) {
         if (!cancelled) {
