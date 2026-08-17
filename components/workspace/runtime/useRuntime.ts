@@ -1,7 +1,5 @@
 "use client";
-
 import { useEffect, useState } from "react";
-
 import type { RuntimeState } from "@/types/runtime";
 import WebContainerManager from "./webcontainermanager";
 
