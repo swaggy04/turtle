@@ -8,7 +8,7 @@ export const generatedFileSchema = z.object({
 
 export const generatedProjectSchema = z.object({
   files: z.array(generatedFileSchema),
-  dependencies: z.record(z.string(), z.string()),
+  dependencies: z.record(z.string(), z.string()).optional(),
 });
 
 export type GeneratedFile = z.infer<
