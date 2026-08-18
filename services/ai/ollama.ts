@@ -1,4 +1,5 @@
 import { GeneratedProject, generatedProjectSchema } from "../ai-schema";
+import { cleanGeneratedProject } from "./cleanGeneratedProject";
 import { SYSTEM_PROMPT } from "./prompt";
 import type { AIProvider, GenerateProjectOptions } from "./provider";
 
@@ -78,6 +79,7 @@ Requirements:
       throw new Error("Ollama returned invalid JSON");
     }
 
-    return generatedProjectSchema.parse(parsed);
+    const project = generatedProjectSchema.parse(parsed);
+    return cleanGeneratedProject(project);
   }
 }

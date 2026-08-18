@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import type { AIProvider, GenerateProjectOptions } from "./provider";
 import { GeneratedProject, generatedProjectSchema } from "../ai-schema";
 import { SYSTEM_PROMPT } from "./prompt";
+import { cleanGeneratedProject } from "./cleanGeneratedProject";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -44,7 +45,7 @@ Requirements:
       console.error(text);
       throw new Error("Gemini returned invalid JSON");
     }
-
-    return generatedProjectSchema.parse(parsed);
+    const project = generatedProjectSchema.parse(parsed);
+    return cleanGeneratedProject(project);
   }
 }

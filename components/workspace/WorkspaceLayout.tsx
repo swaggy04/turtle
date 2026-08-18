@@ -81,15 +81,13 @@ function WorkspaceContent() {
         dispatch({
           type: "SET_DEPENDENCIES",
           payload: project.dependencies,
-        });
-
-        // 🚀 Start the WebContainer runtime
-        await start(project);
-
+        })
+        
         dispatch({
           type: "SET_STATUS",
           payload: "ready",
         });
+        start(project).catch(console.error)
       } catch (error) {
         console.error("Workspace generation failed:", error);
 
