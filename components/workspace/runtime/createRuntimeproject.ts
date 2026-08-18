@@ -1,10 +1,36 @@
+
 import type { FileSystemTree } from "@webcontainer/api";
 import type { GeneratedProject } from "@/services/ai-schema";
+import { getScaffoldFiles } from "./scaffold";
 
-export function createRuntimeProject(project: GeneratedProject): FileSystemTree {
+const SCAFFOLD_PATHS = new Set([
+  "package.json",
+  "tsconfig.json",
+  "next.config.ts",
+  "postcss.config.mjs",
+  "tailwind.config.ts",
+  "next-env.d.ts",
+  "app/globals.css",
+  "app/layout.tsx",
+]);
+
+export function createRuntimeProject(
+  project: GeneratedProject
+): FileSystemTree {
   const tree: FileSystemTree = {};
 
-  for (const file of project.files) {
+  // Keep only AI-generated application files
+  const appFiles = project.files.filter(
+    (file) => !SCAFFOLD_PATHS.has(file.path)
+  );
+
+  // Turtle-owned scaffold + AI files
+  const finalFiles = [
+    ...getScaffoldFiles(project.dependencies ?? {}),
+    ...appFiles,
+  ];
+
+  for (const file of finalFiles) {
     const parts = file.path.split("/");
     let current = tree;
 
