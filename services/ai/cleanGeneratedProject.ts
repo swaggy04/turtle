@@ -2,13 +2,9 @@ import type { GeneratedProject } from "../ai-schema";
 
 function cleanCode(code: string) {
   return code
-    // Remove opening markdown fence
     .replace(/^```[a-zA-Z0-9-]*\n?/, "")
-    // Remove closing markdown fence
     .replace(/\n?```$/, "")
-    // Remove leading "..."
     .replace(/^\.\.\.\s*/, "")
-    // Remove trailing "..."
     .replace(/\s*\.\.\.$/, "")
     .trim();
 }
@@ -21,7 +17,7 @@ function normalizePackageJson(code: string) {
   pkg.version ??= "0.1.0";
 
   pkg.scripts = {
-    dev: "next dev",
+    dev: "next dev --webpack",
     build: "next build",
     start: "next start",
     ...(pkg.scripts ?? {}),
@@ -41,17 +37,23 @@ function normalizePackageJson(code: string) {
     tailwindcss: "latest",
     "@tailwindcss/postcss": "latest",
     postcss: "latest",
+    autoprefixer: "latest",
     ...(pkg.devDependencies ?? {}),
   };
 
-  // Remove known bad packages
-  delete pkg.dependencies?.["tailwindcss-cli"];
-  delete pkg.dependencies?.["@types/next"];
-  delete pkg.dependencies?.["@types/tailwindcss"];
+  // Remove broken packages frequently hallucinated by LLMs
+  const badPackages = [
+    "tailwindcss-cli",
+    "@types/next",
+    "@types/tailwindcss",
+    "@tailwindcss/postcss7-compat",
+    "@sentry/nextjs",
+  ];
 
-  delete pkg.devDependencies?.["tailwindcss-cli"];
-  delete pkg.devDependencies?.["@types/next"];
-  delete pkg.devDependencies?.["@types/tailwindcss"];
+  for (const name of badPackages) {
+    delete pkg.dependencies?.[name];
+    delete pkg.devDependencies?.[name];
+  }
 
   return JSON.stringify(pkg, null, 2);
 }
@@ -65,6 +67,23 @@ export default nextConfig;
 `;
 }
 
+function normalizePostcssConfig() {
+  return `const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+`;
+}
+
+function normalizeLayout(code: string) {
+  return cleanCode(code)
+    .replace(/@next\/font\/google/g, "next/font/google")
+    .replace(/@next\/font/g, "next/font");
+}
+
 export function cleanGeneratedProject(
   project: GeneratedProject
 ): GeneratedProject {
@@ -73,12 +92,22 @@ export function cleanGeneratedProject(
     files: project.files.map((file) => {
       let code = cleanCode(file.code);
 
-      if (file.path === "package.json") {
-        code = normalizePackageJson(code);
-      }
+      switch (file.path) {
+        case "package.json":
+          code = normalizePackageJson(code);
+          break;
 
-      if (file.path === "next.config.ts") {
-        code = normalizeNextConfig();
+        case "next.config.ts":
+          code = normalizeNextConfig();
+          break;
+
+        case "postcss.config.mjs":
+          code = normalizePostcssConfig();
+          break;
+
+        case "app/layout.tsx":
+          code = normalizeLayout(code);
+          break;
       }
 
       return {
