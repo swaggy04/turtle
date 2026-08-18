@@ -1,9 +1,6 @@
 import WebContainerManager from "./webcontainermanager";
 
-
-export async function startDevServer(
-  onLog?: (log: string) => void
-): Promise<string> {
+export async function startDevServer(onLog?: (log: string) => void): Promise<string> {
   const webcontainer = await WebContainerManager.getInstance();
 
   const devProcess = await webcontainer.spawn("npm", ["run", "dev"]);
@@ -13,7 +10,7 @@ export async function startDevServer(
       write(chunk) {
         onLog?.(chunk);
       },
-    })
+    }),
   );
 
   return new Promise((resolve) => {
