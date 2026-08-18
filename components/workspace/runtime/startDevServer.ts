@@ -13,9 +13,17 @@ export async function startDevServer(onLog?: (log: string) => void): Promise<str
     }),
   );
 
-  return new Promise((resolve) => {
-    webcontainer.on("server-ready", (_port, url) => {
+  return new Promise((resolve, reject) => {
+    const off = webcontainer.on("server-ready", (_port, url) => {
+      off();
       resolve(url);
+    });
+
+    devProcess.exit.then((code) => {
+      if (code !== 0) {
+        off();
+        reject(new Error(`Dev server exited with code ${code}`));
+      }
     });
   });
 }

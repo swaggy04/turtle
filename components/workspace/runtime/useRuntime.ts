@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 
+import { mountProject } from "./mountProject";
+import { installDependencies } from "./installDependencies";
+import { startDevServer } from "./startDevServer";
+
+import type { GeneratedProject } from "@/services/ai-schema";
 import type { RuntimeState } from "@/types/runtime";
-import WebContainerManager from "./webcontainermanager";
 
 const initialState: RuntimeState = {
   status: "idle",
@@ -15,44 +19,47 @@ const initialState: RuntimeState = {
 export function useRuntime() {
   const [runtime, setRuntime] = useState(initialState);
 
-  useEffect(() => {
-    let cancelled = false;
+  const start = useCallback(async (project: GeneratedProject) => {
+    try {
+      setRuntime({
+        status: "mounting",
+        previewUrl: null,
+        logs: [],
+        error: null,
+      });
 
-    async function boot() {
-      try {
-        // Tell the UI that boot has started
+      await mountProject(project);
+
+      setRuntime((prev) => ({
+        ...prev,
+        status: "installing",
+      }));
+
+      await installDependencies();
+
+      const previewUrl = await startDevServer((log) => {
         setRuntime((prev) => ({
           ...prev,
-          status: "booting",
+          logs: [...prev.logs, log],
         }));
+      });
 
-        // Get (or create) the single WebContainer instance
-        await WebContainerManager.getInstance();
-
-        // Don't update state if the component has already unmounted
-        if (!cancelled) {
-          setRuntime((prev) => ({
-            ...prev,
-            status: "idle", // We'll later change this to "ready"
-          }));
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setRuntime((prev) => ({
-            ...prev,
-            status: "error",
-            error: err instanceof Error ? err.message : "Boot failed",
-          }));
-        }
-      }
+      setRuntime((prev) => ({
+        ...prev,
+        status: "running",
+        previewUrl,
+      }));
+    } catch (err) {
+      setRuntime((prev) => ({
+        ...prev,
+        status: "error",
+        error: err instanceof Error ? err.message : "Runtime failed",
+      }));
     }
-
-    boot();
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
-  return runtime;
+  return {
+    runtime,
+    start,
+  };
 }
