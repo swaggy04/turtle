@@ -10,18 +10,29 @@ import { FileExplorer } from "./FileExplorer";
 import { CodeEditor } from "./CodeEditor";
 import { WorkspaceViewToggle } from "./WorkspaceViewToggle";
 import { ModelSelector } from "./ModelSelector";
+import Preview from "./preview/Preview";
+
+import { RuntimeProvider } from "./runtime/RuntimeProvider";
+import { useRuntime } from "./runtime/useRuntime";
 
 import type { AIProviderName } from "@/services/ai/types";
 import type { GeneratedProject } from "@/services/ai-schema";
-import Preview from "./preview/Preview";
 
-const WorkspaceClient = () => {
+export default function WorkspaceClient() {
+  return (
+    <RuntimeProvider>
+      <WorkspaceContent />
+    </RuntimeProvider>
+  );
+}
+
+function WorkspaceContent() {
   const { state, dispatch } = useWorkspace();
+  const { start } = useRuntime();
   const searchParams = useSearchParams();
 
   const generationStartedRef = useRef<string | null>(null);
 
-  // Initialize workspace from URL
   useEffect(() => {
     const prompt = searchParams.get("prompt") ?? "";
     const provider = (searchParams.get("provider") as AIProviderName | null) ?? "ollama";
@@ -41,7 +52,6 @@ const WorkspaceClient = () => {
     });
   }, [dispatch, searchParams]);
 
-  // Generate project once
   useEffect(() => {
     const prompt = state.prompt.trim();
 
@@ -73,6 +83,9 @@ const WorkspaceClient = () => {
           payload: project.dependencies,
         });
 
+        // 🚀 Start the WebContainer runtime
+        await start(project);
+
         dispatch({
           type: "SET_STATUS",
           payload: "ready",
@@ -88,11 +101,10 @@ const WorkspaceClient = () => {
     }
 
     generate();
-  }, [state.prompt, state.provider, state.model, state.status, dispatch]);
+  }, [state.prompt, state.provider, state.model, state.status, dispatch, start]);
 
   const activeFile = state.activeFile ? state.files[state.activeFile] : null;
 
-  // Convert workspace state back into the GeneratedProject shape
   const runtimeProject: GeneratedProject | null =
     Object.keys(state.files).length === 0
       ? null
@@ -227,6 +239,4 @@ const WorkspaceClient = () => {
       </section>
     </div>
   );
-};
-
-export default WorkspaceClient;
+}
