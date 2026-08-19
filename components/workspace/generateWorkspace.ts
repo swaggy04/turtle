@@ -1,4 +1,4 @@
-import { WorkspaceFile } from "./provider/workspace-types";
+import type { WorkspaceFile } from "@/types/workspace";
 
 interface GeneratedProject {
   files: WorkspaceFile[];
