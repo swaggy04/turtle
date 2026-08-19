@@ -11,24 +11,14 @@ import { CodeEditor } from "./CodeEditor";
 import { WorkspaceViewToggle } from "./WorkspaceViewToggle";
 import { ModelSelector } from "./ModelSelector";
 import Preview from "./preview/Preview";
-
-import { RuntimeProvider } from "./runtime/RuntimeProvider";
-import { useRuntime } from "./runtime/useRuntime";
-
 import type { AIProviderName } from "@/services/ai/types";
-import type { GeneratedProject } from "@/services/ai-schema";
 
 export default function WorkspaceClient() {
-  return (
-    <RuntimeProvider>
-      <WorkspaceContent />
-    </RuntimeProvider>
-  );
+  return <WorkspaceContent />;
 }
 
 function WorkspaceContent() {
   const { state, dispatch } = useWorkspace();
-  const { start } = useRuntime();
   const searchParams = useSearchParams();
 
   const generationStartedRef = useRef<string | null>(null);
@@ -81,13 +71,12 @@ function WorkspaceContent() {
         dispatch({
           type: "SET_DEPENDENCIES",
           payload: project.dependencies,
-        })
-        
+        });
+
         dispatch({
           type: "SET_STATUS",
           payload: "ready",
         });
-        start(project).catch(console.error)
       } catch (error) {
         console.error("Workspace generation failed:", error);
 
@@ -99,21 +88,11 @@ function WorkspaceContent() {
     }
 
     generate();
-  }, [state.prompt, state.provider, state.model, state.status, dispatch, start]);
+  }, [state.prompt, state.provider, state.model, state.status, dispatch]);
+
 
   const activeFile = state.activeFile ? state.files[state.activeFile] : null;
 
-  const runtimeProject: GeneratedProject | null =
-    Object.keys(state.files).length === 0
-      ? null
-      : {
-          files: Object.values(state.files).map((file) => ({
-            path: file.path,
-            code: file.code,
-            language: file.language,
-          })),
-          dependencies: state.dependencies,
-        };
 
   return (
     <div className="flex h-full min-h-0 w-full overflow-hidden">

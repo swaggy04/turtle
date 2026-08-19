@@ -50,15 +50,39 @@ export function Navbar() {
           {!isPending &&
             (session ? (
               <>
+                {/* Plan & Credits Badges */}
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
+                    ⚡ {(session.user as { credits?: number }).credits ?? 10} Credits
+                  </span>
+                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium uppercase text-primary border border-primary/20">
+                    {(session.user as { plan?: string }).plan ?? "free"}
+                  </span>
+                </div>
+
                 {/* User Name */}
                 <span className="hidden text-sm font-medium md:block">
                   {session.user.name}
                 </span>
 
                 {/* Avatar */}
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground">
-                  {session.user.name?.charAt(0).toUpperCase()}
-                </div>
+                {(session.user as { imageUrl?: string }).imageUrl ? (
+                  <img
+                    src={(session.user as { imageUrl?: string }).imageUrl}
+                    alt={session.user.name ?? "User"}
+                    className="h-10 w-10 rounded-full object-cover border border-border"
+                  />
+                ) : session.user.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name ?? "User"}
+                    className="h-10 w-10 rounded-full object-cover border border-border"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground">
+                    {session.user.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
 
                 {/* Logout */}
                 <Button

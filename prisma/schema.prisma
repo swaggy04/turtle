@@ -9,13 +9,14 @@ datasource db {
 
 model User {
   id            String      @id @default(cuid())
+  clerkId       String?     @unique
   name          String
   email         String      @unique
-  image         String?
-  credits       Int         @default(10)
+  imageUrl      String      @default("")
+  credits       Int         @default(10) // starts at free tier allocation
+  plan          String      @default("free")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  plan          Plan        @default(FREE)
   emailVerified Boolean     @default(false)
   workspaces    Workspace[]
   accounts      Account[]
@@ -26,13 +27,13 @@ model User {
 
 model Workspace {
   id        String   @id @default(cuid())
-  title     String   @default("Untitled Project")
+  title     String?
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  Json     @default("[]")
   fileData  Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -87,7 +88,3 @@ model Verification {
   @@map("verification")
 }
 
-enum Plan {
-  FREE
-  PRO
-}
