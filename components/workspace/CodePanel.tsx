@@ -1,59 +1,88 @@
 "use client";
 
+import { FileData, StatusStep } from "@/types/workspace";
 import { useState } from "react";
+import {
+  SandpackProvider,
+  SandpackLayout,
+  SandpackCodeEditor,
+  SandpackPreview,
+  SandpackFileExplorer,
+  useSandpack,
+} from "@codesandbox/sandpack-react";
+import { dracula } from "@codesandbox/sandpack-themes";
+const PLACEHOLDER_FILES = {
+  "/App.js": {
+    code: `export default function App() {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#0a0a0a",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontFamily: "system-ui, sans-serif",
+    }}>
+      <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)" }}>
+        <div style={{ fontSize: 40, marginBottom: 16 }}>⚡</div>
+        <p style={{ fontSize: 14 }}>Your app will appear here</p>
+      </div>
+    </div>
+  );
+}`,
+  },
+};
+const BASE_DEPENDENCIES: Record<string, string> = {
+  "react-is": "latest",
+  "react-router-dom": "latest",
+  "lucide-react": "latest",
+  recharts: "latest",
+  "date-fns": "latest",
+  "framer-motion": "latest",
+  "react-hook-form": "latest",
+  "@hookform/resolvers": "latest",
+  zod: "latest",
+  "@radix-ui/react-dialog": "latest",
+  "@radix-ui/react-dropdown-menu": "latest",
+  "@radix-ui/react-tabs": "latest",
+  "@radix-ui/react-tooltip": "latest",
+  "@radix-ui/react-accordion": "latest",
+  "@radix-ui/react-select": "latest",
+  axios: "latest",
+  clsx: "latest",
+  "class-variance-authority": "latest",
+  "tailwind-merge": "latest",
+};
+type activeTab = "code" | "preview";
 
-export function CodePanel() {
-  const [view, setView] = useState<"code" | "preview">("code");
+interface codePanelProps {
+  fileData: FileData | null
+  isgenerating: boolean
+  statusLog: StatusStep[]
+  onfilePatch: (patches: FileData) => void
+}
+export function CodePanel({ fileData, isgenerating, statusLog, onfilePatch: _onfilePatch }: codePanelProps) {
+
+  const [activeTab, setActiveTab] = useState<activeTab>("preview");
+  const files = fileData?.files ?? PLACEHOLDER_FILES
+  const dependencies = { ...BASE_DEPENDENCIES, ...(fileData?.dependencies ?? {}) }
+  const filePathKeys = Object.keys(files).sort().join('|')
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#0a0a0a]">
-      {/* Top bar */}
-      <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 px-4">
-        <span className="text-sm text-white/40">
-          {view === "code" ? "Code Editor" : "Preview"}
-        </span>
+    <div>
+      <SandpackProvider key={filePathKeys}
+        template="react"
+        files={files}
+        theme={dracula}
+        customSetup={{ dependencies }}
+        options={{
+          externalResources: ["https://cdn.tailwind.css"],
+          recompileMode: "delayed",
+          recompileDelay: 500,
+        }}
+      >
 
-        {/* View toggle */}
-        <div className="flex items-center gap-1 rounded-lg bg-white/5 p-1">
-          <button
-            onClick={() => setView("code")}
-            className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              view === "code"
-                ? "bg-white/10 text-white"
-                : "text-white/40 hover:text-white/70"
-            }`}
-          >
-            Code
-          </button>
-          <button
-            onClick={() => setView("preview")}
-            className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              view === "preview"
-                ? "bg-white/10 text-white"
-                : "text-white/40 hover:text-white/70"
-            }`}
-          >
-            Preview
-          </button>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="min-h-0 flex-1 overflow-hidden">
-        {view === "code" ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <p className="text-sm text-white/30">Code editor will appear here.</p>
-            </div>
-          </div>
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <p className="text-sm text-white/30">Preview will appear here.</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
-  );
+      </SandpackProvider>
+    </div>
+  )
 }

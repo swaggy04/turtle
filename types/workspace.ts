@@ -28,31 +28,6 @@ export interface WorkspaceData {
 
 export interface WorkspaceUser {
   id: string;
-}
-
-export type WorkspaceStatus = "idle" | "planning" | "generating" | "ready" | "patching" | "error";
-export type WorkspaceView = "code" | "preview";
-
-export interface WorkspaceFile {
-  path: string;
-  code: string;
-  language?: string;
-}
-
-export interface WorkspaceRuntime {
-  compiling: boolean;
-  error: string | null;
-}
-
-export interface WorkspaceState {
-  prompt: string;
-  status: WorkspaceStatus;
-  files: Record<string, WorkspaceFile>;
-  dependencies: Record<string, string>;
-  activeFile: string | null;
-  messages: Message[];
-  provider: "ollama" | "gemini";
-  model: string;
-  runtime: WorkspaceRuntime;
-  view: WorkspaceView;
+  credits: number;
+  plan: string;
 }
