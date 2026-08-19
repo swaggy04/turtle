@@ -1,7 +1,6 @@
 
 export type RuntimeStatus =
   | "idle"
-  | "booting"
   | "mounting"
   | "installing"
   | "running"
