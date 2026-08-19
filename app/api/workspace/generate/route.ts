@@ -31,55 +31,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Model is required" }, { status: 400 });
     }
 
-    // Check user credits
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    });
-
-    if (user && user.credits <= 0 && user.plan === "free") {
-      return NextResponse.json(
-        { error: "You have run out of generation credits. Please upgrade your plan." },
-        { status: 403 }
-      );
-    }
-
     const project = await generateProject({
       prompt: prompt.trim(),
       provider: provider as AIProviderName,
       model: model.trim(),
     });
 
-    // Deduct 1 credit & Save Workspace to Prisma DB
-    if (user) {
-      const newCredits = Math.max(0, user.credits - 1);
-      
-      const titleSnippet = prompt.trim().slice(0, 30);
-      const title = titleSnippet.length < prompt.trim().length ? `${titleSnippet}...` : titleSnippet;
+    // Save Workspace to Prisma DB
+    const userId = session.user.id;
+    const titleSnippet = prompt.trim().slice(0, 30);
+    const title = titleSnippet.length < prompt.trim().length ? `${titleSnippet}...` : titleSnippet;
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { credits: newCredits },
+    if (workspaceId) {
+      await prisma.workspace.update({
+        where: { id: workspaceId },
+        data: {
+          fileData: project.files as unknown as object,
+          messages: [{ role: "user", content: prompt }, { role: "assistant", content: "Project generated" }],
+        },
       });
-
-      if (workspaceId) {
-        await prisma.workspace.update({
-          where: { id: workspaceId },
-          data: {
-            fileData: project.files as unknown as object,
-            messages: [{ role: "user", content: prompt }, { role: "assistant", content: "Project generated" }],
-          },
-        });
-      } else {
-        await prisma.workspace.create({
-          data: {
-            title,
-            userId: user.id,
-            fileData: project.files as unknown as object,
-            messages: [{ role: "user", content: prompt }, { role: "assistant", content: "Project generated" }],
-          },
-        });
-      }
-
+    } else {
+      await prisma.workspace.create({
+        data: {
+          title,
+          userId,
+          fileData: project.files as unknown as object,
+          messages: [{ role: "user", content: prompt }, { role: "assistant", content: "Project generated" }],
+        },
+      });
     }
 
     return NextResponse.json(project);

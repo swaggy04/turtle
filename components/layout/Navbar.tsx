@@ -50,11 +50,8 @@ export function Navbar() {
           {!isPending &&
             (session ? (
               <>
-                {/* Plan & Credits Badges */}
+                {/* Plan Badge */}
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-                    ⚡ {(session.user as { credits?: number }).credits ?? 10} Credits
-                  </span>
                   <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium uppercase text-primary border border-primary/20">
                     {(session.user as { plan?: string }).plan ?? "free"}
                   </span>

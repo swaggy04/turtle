@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { PlusCircle, Sparkles, FolderGit2, Coins, ShieldCheck, Clock } from "lucide-react";
+import { PlusCircle, Sparkles, FolderGit2, ShieldCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
@@ -15,7 +15,7 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  // Fetch full user data & workspaces from database using updated Prisma schema
+  // Fetch user data & workspaces
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
@@ -25,7 +25,6 @@ export default async function DashboardPage() {
     },
   });
 
-  const credits = user?.credits ?? 10;
   const plan = user?.plan ?? "free";
   const workspaces = user?.workspaces ?? [];
 
@@ -39,7 +38,7 @@ export default async function DashboardPage() {
               Welcome back, {user?.name ?? session.user.name} 🐢
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Manage your AI workspaces, monitor your generation credits, and build applications.
+              Manage your AI workspaces and build applications.
             </p>
           </div>
 
@@ -52,27 +51,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Credits Card */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                Generation Credits
-              </span>
-              <Coins className="h-5 w-5 text-emerald-400" />
-            </div>
-            <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-white">{credits}</span>
-              <span className="text-xs text-zinc-400">/ 10 Free Allocation</span>
-            </div>
-            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div
-                className="h-full bg-emerald-500 transition-all"
-                style={{ width: `${Math.min(100, (credits / 10) * 100)}%` }}
-              />
-            </div>
-          </div>
-
+        <div className="mt-8 grid gap-6 sm:grid-cols-2">
           {/* Current Plan Card */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
             <div className="flex items-center justify-between">
@@ -88,12 +67,12 @@ export default async function DashboardPage() {
               </span>
             </div>
             <p className="mt-4 text-xs text-zinc-400">
-              {plan === "free" ? "Upgrade to Pro for unlimited AI generation & priority support." : "Pro tier tier active."}
+              {plan === "free" ? "Unlimited workspace building." : "Pro tier active."}
             </p>
           </div>
 
           {/* Workspaces Count Card */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm sm:col-span-2 lg:col-span-1">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 Total Workspaces
@@ -105,7 +84,7 @@ export default async function DashboardPage() {
               <span className="text-xs text-zinc-400">Projects Created</span>
             </div>
             <p className="mt-4 text-xs text-zinc-400">
-              All generated files and conversation history stored securely.
+              All generated files and workspace data stored securely.
             </p>
           </div>
         </div>
