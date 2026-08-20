@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useWorkspace } from "./provider/WorkspaceContext";
 import { ChatPanel } from "./ChatPanel";
-import { CodePanel } from "./CodePanel";
+import { CodePanel } from "./codePanel";
 import type { AIProviderName } from "@/services/ai/types";
 
 export default function WorkspaceClient() {
