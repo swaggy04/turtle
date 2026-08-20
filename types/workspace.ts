@@ -6,12 +6,15 @@ export interface Message {
   imageUrl?: string;
 }
 
-// files + dependencies always travel together as one unit
-// this is what gets saved to Prisma as a single Json column
-export interface FileData {
-  files: Record<string, { code: string }>;
-  dependencies: Record<string, string>;
+/**
+ * This is the single source of truth for a generated app.
+ * It gets saved in Prisma and passed directly to Sandpack.
+ */
+export interface Project {
   title: string;
+  prompt: string;
+  framework: "react";
+  files: Record<string, string>;
 }
 
 export interface StatusStep {
@@ -22,8 +25,8 @@ export interface StatusStep {
 export interface WorkspaceData {
   id: string;
   title: string | null;
-  messages: unknown; // Prisma returns Json — we parse it
-  fileData: unknown;
+  messages: unknown; // Parsed into Message[]
+  fileData: unknown; // Parsed into Project
 }
 
 export interface WorkspaceUser {
